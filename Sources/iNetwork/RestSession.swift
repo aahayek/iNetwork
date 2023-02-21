@@ -22,7 +22,9 @@ extension Interceptor {
 public protocol RestPerformer {
     func response(for req: URLRequest) -> AnyPublisher<Data, ServiceError>
     func response<T: Decodable>(for req: URLRequest) -> AnyPublisher<T, ServiceError>
-    func addIntercapter(_ intercapter: any Interceptor)
+    func addInteractor(_ interactor: any Interceptor)
+    func response<T: Decodable>(for endPoint: EndPoint) -> AnyPublisher<T,ServiceError>
+    func response(for endPoint: EndPoint) -> AnyPublisher<Data, ServiceError>
 }
 
 public protocol RestChain {

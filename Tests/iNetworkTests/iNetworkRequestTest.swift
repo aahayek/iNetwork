@@ -52,14 +52,14 @@ final class iNetworkRequestTest: XCTestCase {
     func testResponseIntercapter() throws {
         let request: URLRequest = .init(url: URL(string: "https://the-trivia-api.com/api/categories")!)
         let responseIntercapter = ResponseRecorderInterceptor()
-        restPerformer.addIntercapter(responseIntercapter)
+        restPerformer.addInteractor(responseIntercapter)
         let publisher = restPerformer.response(for: request)
         
         let data = try awaitPublisherSuccess(publisher, timeoutAfter: 4, expectationDescription: "await fetch and save").0!
         
         
         let requestIntercapter = RequestReaderInterceptor()
-        restPerformer.addIntercapter(requestIntercapter)
+        restPerformer.addInteractor(requestIntercapter)
         
         let mockPublisher = restPerformer.response(for: request)
         

@@ -19,7 +19,7 @@ final class TokenIntercaptorTest: XCTestCase {
         try super.setUpWithError()
         restPerformer = RestPerformerImpl(urlSession: MocKRestSession())
         tokenIntercepor = TokenInterceptor()
-        restPerformer.addIntercapter(tokenIntercepor)
+        restPerformer.addInteractor(tokenIntercepor)
         tokenCache = token
     }
 
@@ -36,7 +36,7 @@ final class TokenIntercaptorTest: XCTestCase {
             XCTAssertEqual(requestAuth,
                            expectedAuth)
         })
-        restPerformer.addIntercapter(mockTokenIntercpter)
+        restPerformer.addInteractor(mockTokenIntercpter)
         var request: URLRequest = .init(url: URL(string: "https://the-trivia-api.com/api/categories")!)
         request.addValue("", forHTTPHeaderField: MocKRestSession.httpHeaderFieldForMockCode)
         let publisher: AnyPublisher<Data, ServiceError> = restPerformer.response(for: request)
