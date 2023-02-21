@@ -15,15 +15,15 @@ public struct RestChainImpl: RestChain {
 
 public class RestPerformerImpl: RestPerformer {
     private let urlSession: RestURLSession
-    private var intercoter: [Interceptor]
+    private var interactors: [Interceptor]
 
-    public init(urlSession: RestURLSession, intercoter: [Interceptor] = []) {
+    public init(urlSession: RestURLSession, interactor: [Interceptor] = []) {
         self.urlSession = urlSession
-        self.intercoter = intercoter
+        self.interactors = interactor
     }
 
-    public func addIntercapter(_ intercapter: any Interceptor) {
-        intercoter.append(intercapter)
+    public func addInteractor(_ interactor: any Interceptor) {
+        interactors.append(interactor)
     }
 
     private func logError(_ error: DecodingError) {
@@ -44,6 +44,14 @@ public class RestPerformerImpl: RestPerformer {
         }
     }
 
+    public func response<T>(for endPoint: EndPoint) -> AnyPublisher<T, ServiceError> where T : Decodable {
+        response(for: endPoint.request)
+    }
+    
+    public func response(for endPoint: EndPoint) -> AnyPublisher<Data, ServiceError> {
+        response(for: endPoint.request)
+    }
+
     public func response<T: Decodable>(for req: URLRequest) -> AnyPublisher<T, ServiceError> {
         response(for: req)
             .decode(type: T.self, decoder: JSONDecoder())
@@ -53,7 +61,7 @@ public class RestPerformerImpl: RestPerformer {
                     return serviceError
                 case let decodingError as DecodingError:
                     self?.logError(decodingError)
-                    return .parseError(type: "Failed to retrive data", code: NSURLErrorCannotDecodeRawData)
+                    return .parseError(type: "Failed to retrieve data", code: NSURLErrorCannotDecodeRawData)
                 default:
                     return .parseError(type: "\(anyError)", code: NSURLErrorCannotDecodeRawData)
                 }
@@ -62,7 +70,7 @@ public class RestPerformerImpl: RestPerformer {
     }
 
     public func response(for req: URLRequest) -> AnyPublisher<Data, ServiceError> {
-        let chain = intercoter.reduce(RestChainImpl(urlSession: urlSession, urlRequest: req)) { partialResult, intercpter in
+        let chain = interactors.reduce(RestChainImpl(urlSession: urlSession, urlRequest: req)) { partialResult, intercpter in
             intercpter.intercept(chain: partialResult)
         }
         return retryableResponse(for: chain)
@@ -72,12 +80,12 @@ public class RestPerformerImpl: RestPerformer {
         request.urlSession.restDataTaskPublisher(for: request.urlRequest)
             .mapToDataAndServiceError()
             .handleEvents(receiveOutput: { [weak self] data in
-                self?.intercoter.forEach {
+                self?.interactors.forEach {
                     $0.intercept(request: addCodeFieldToRequest(request.urlRequest, code: "200"), output: data, error: nil)
                 }
             }, receiveCompletion: { [weak self] completion in
                 if case let .failure(error)  = completion {
-                    self?.intercoter.forEach {
+                    self?.interactors.forEach {
                         
                         $0.intercept(request: addCodeFieldToRequest(request.urlRequest, code: String(error.code)),
                                      output: nil, error: error)

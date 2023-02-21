@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "iNetwork",
     platforms: [
-        .macOS(.v11),
+        .macOS(.v13),
         .iOS(.v14)
     ],
     products: [

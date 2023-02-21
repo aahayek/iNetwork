@@ -13,7 +13,7 @@ public struct ResponseRecorderInterceptor: Interceptor {
 
     public func intercept(request: URLRequest, output: Data?, error: ServiceError?)  {
         guard let fileUrl = mockFile(from: request) else {
-            logger.error("fielUrl not found from \(request.description)")
+            logger.error("file URL not found from \(request.description)")
             return
         }
         do {
