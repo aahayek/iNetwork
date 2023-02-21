@@ -45,7 +45,7 @@ public class RestPerformerImpl: RestPerformer {
     }
 
     public func response<T>(for endPoint: EndPoint) -> AnyPublisher<T, ServiceError> where T : Decodable {
-        response(for: endPoint.request)
+        response(for: endPoint.request, using: endPoint.decoder)
     }
     
     public func response(for endPoint: EndPoint) -> AnyPublisher<Data, ServiceError> {
@@ -53,8 +53,12 @@ public class RestPerformerImpl: RestPerformer {
     }
 
     public func response<T: Decodable>(for req: URLRequest) -> AnyPublisher<T, ServiceError> {
+        response(for: req, using: JSONDecoder())
+    }
+
+    private func response<T>(for req: URLRequest, using decoder: JSONDecoder) -> AnyPublisher<T, ServiceError> where T: Decodable {
         response(for: req)
-            .decode(type: T.self, decoder: JSONDecoder())
+            .decode(type: T.self, decoder: decoder)
             .mapError { [weak self] anyError in
                 switch anyError {
                 case let serviceError as ServiceError:

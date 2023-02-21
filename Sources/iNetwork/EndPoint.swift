@@ -26,6 +26,11 @@ public struct EndPoint {
 
     private var httpMethod: HttpMethod = .GET
 
+    private var _decoder: JSONDecoder?
+    var decoder: JSONDecoder {
+        _decoder ?? JSONDecoder()
+    }
+
     public init( url: URL, queries: [URLQueryItem] = [], body: Data? = nil) {
         self.url = url
         self.queries = queries
@@ -54,6 +59,11 @@ public struct EndPoint {
 
     public mutating func method(_ method: HttpMethod) -> EndPoint {
         httpMethod = method
+        return self
+    }
+
+    public mutating func decode(using decoder: JSONDecoder) -> EndPoint {
+        self._decoder = decoder
         return self
     }
 
