@@ -37,31 +37,37 @@ public struct EndPoint {
         self.httpBody = body
     }
 
+    @discardableResult
     public mutating func add(_ query: URLQueryItem...) -> EndPoint {
         queries.append(contentsOf: query)
         return self
     }
    
+    @discardableResult
     public mutating func body(_ data: Data) -> EndPoint {
         httpBody = data
         return self
     }
 
+    @discardableResult
     public mutating func body(_ encodable: some Encodable) throws -> EndPoint {
         httpBody = try JSONEncoder().encode(encodable)
         return self
     }
 
+    @discardableResult
     public mutating func body(_ any: Any) throws -> EndPoint {
         httpBody = try JSONSerialization.data(withJSONObject: any)
         return self
     }
 
+    @discardableResult
     public mutating func method(_ method: HttpMethod) -> EndPoint {
         httpMethod = method
         return self
     }
 
+    @discardableResult
     public mutating func decode(using decoder: JSONDecoder) -> EndPoint {
         self._decoder = decoder
         return self
