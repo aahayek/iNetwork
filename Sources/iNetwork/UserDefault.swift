@@ -41,7 +41,7 @@ public struct UserDefault<Value: Codable> where Value: Equatable {
     }
 }
 
-extension UserDefaults {
+public extension UserDefaults {
     func value<T: Decodable>(forKey key: String) -> T? {
         if let data = self.object(forKey: key) as? Data {
             let decoder = JSONDecoder()
